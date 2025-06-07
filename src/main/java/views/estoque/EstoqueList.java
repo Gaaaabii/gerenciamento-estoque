@@ -18,8 +18,12 @@ public class EstoqueList extends JPanel {
     }
 
     private void loadEstoque() {
-        List<Estoque> roupas = estoqueDAO.listarTodos(); // ajuste aqui
+        List<Estoque> roupas = estoqueDAO.listarTodos();
         tableModel.setRoupas(roupas);
+    }
+
+    public void atualizarTabela() {
+        loadEstoque();
     }
 
     private void initComponents() {

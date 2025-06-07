@@ -1,6 +1,6 @@
 import views.estoque.EstoqueList;
+import views.estoque.EstoqueForm;
 import views.user.UserList;
-import views.estoque.EstoqueList;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +10,7 @@ public class GerenciadorProjetoApp extends JFrame {
     private static final String EMPTY_SCREEN = "EMPTY_SCREEN";
     private static final String USER_LIST_SCREEN = "USER_LIST_SCREEN";
     private static final String ESTOQUE_LIST_SCREEN = "ESTOQUE_LIST_SCREEN";
+    private static final String ESTOQUE_FORM_SCREEN = "ESTOQUE_FORM_SCREEN";
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
@@ -36,13 +37,18 @@ public class GerenciadorProjetoApp extends JFrame {
         EstoqueList estoqueList = new EstoqueList();
         mainPanel.add(estoqueList, ESTOQUE_LIST_SCREEN);
 
+        EstoqueForm estoqueForm = new EstoqueForm();
+        mainPanel.add(estoqueForm, ESTOQUE_FORM_SCREEN);
+
         JMenu menu = new JMenu("Menu");
         JMenuItem listUsersItem = new JMenuItem("Listar Usuários");
         JMenuItem listEstoqueItem = new JMenuItem("Listar Estoque");
+        JMenuItem cadastrarEstoqueItem  = new JMenuItem("Cadastrar Estoque");
         JMenuItem exitItem = new JMenuItem("Sair");
 
         menu.add(listUsersItem);
         menu.add(listEstoqueItem);
+        menu.add(cadastrarEstoqueItem);
         menu.add(exitItem);
 
         JMenuBar menuBar = new JMenuBar();
@@ -55,8 +61,14 @@ public class GerenciadorProjetoApp extends JFrame {
         });
 
         listEstoqueItem.addActionListener(e -> {
+            estoqueList.atualizarTabela();
             cardLayout.show(mainPanel, ESTOQUE_LIST_SCREEN);
         });
+
+        cadastrarEstoqueItem.addActionListener(e -> {
+            cardLayout.show(mainPanel, ESTOQUE_FORM_SCREEN);
+        });
+
 
         exitItem.addActionListener(event -> {
             dispose();
