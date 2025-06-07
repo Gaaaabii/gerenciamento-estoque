@@ -4,6 +4,7 @@
         <class>models.Usuario</class>
         <class>models.Projeto</class>
         <class>models.Tarefa</class>
+        <class>models.Estoque</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.sqlite.JDBC"/>
