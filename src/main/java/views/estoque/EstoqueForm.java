@@ -7,10 +7,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class EstoqueForm extends JPanel {
-
     private JTextField nomeField, tamanhoField, corField, quantidadeField, precoField, categoriaField;
     private JButton salvarButton;
     private EstoqueDAO estoqueDAO = new EstoqueDAO();
+    private Estoque estoqueAtual;
+    private Runnable aoSalvarCallback;
+
 
     public EstoqueForm() {
         setLayout(new GridBagLayout());
@@ -61,6 +63,10 @@ public class EstoqueForm extends JPanel {
         salvarButton.addActionListener(e -> salvarEstoque());
     }
 
+    public void setAoSalvarCallback(Runnable callback) {
+        this.aoSalvarCallback = callback;
+    }
+
     private void salvarEstoque() {
         try {
             String nome = nomeField.getText();
@@ -70,21 +76,57 @@ public class EstoqueForm extends JPanel {
             double preco = Double.parseDouble(precoField.getText());
             String categoria = categoriaField.getText();
 
-            Estoque estoque = new Estoque(nome, tamanho, cor, quantidade, preco, categoria);
-            estoqueDAO.salvar(estoque);
+            if (estoqueAtual == null) {
+                // Novo item
+                Estoque novo = new Estoque(nome, tamanho, cor, quantidade, preco, categoria);
+                estoqueDAO.salvar(novo);
+            } else {
+                // Edição
+                estoqueAtual.setNome(nome);
+                estoqueAtual.setTamanho(tamanho);
+                estoqueAtual.setCor(cor);
+                estoqueAtual.setQuantidade(quantidade);
+                estoqueAtual.setPrecoUnitario(preco);
+                estoqueAtual.setCategoria(categoria);
+
+                estoqueDAO.atualizar(estoqueAtual);
+            }
 
             JOptionPane.showMessageDialog(this, "Item salvo com sucesso!");
 
-            // Limpar campos
-            nomeField.setText("");
-            tamanhoField.setText("");
-            corField.setText("");
-            quantidadeField.setText("");
-            precoField.setText("");
-            categoriaField.setText("");
+            limparCampos(); // limpa tudo inclusive estoqueAtual
+
+            if (aoSalvarCallback != null) {
+                aoSalvarCallback.run();
+            }
 
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Erro ao salvar: " + ex.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+
+    public void preencherCampos(Estoque estoque) {
+        this.estoqueAtual = estoque;
+        nomeField.setText(estoque.getNome());
+        tamanhoField.setText(estoque.getTamanho());
+        corField.setText(estoque.getCor());
+        quantidadeField.setText(String.valueOf(estoque.getQuantidade()));
+        precoField.setText(String.valueOf(estoque.getPrecoUnitario()));
+        categoriaField.setText(estoque.getCategoria());
+    }
+
+
+    public void limparCampos() {
+        estoqueAtual = null;
+        nomeField.setText("");
+        tamanhoField.setText("");
+        corField.setText("");
+        quantidadeField.setText("");
+        precoField.setText("");
+        categoriaField.setText("");
+    }
+
 }

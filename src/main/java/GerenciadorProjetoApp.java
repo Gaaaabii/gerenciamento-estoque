@@ -1,6 +1,8 @@
 import views.estoque.EstoqueList;
 import views.estoque.EstoqueForm;
+import views.utils.ButtonEditor;
 import views.user.UserList;
+import models.Estoque;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +15,9 @@ public class GerenciadorProjetoApp extends JFrame {
     private static final String ESTOQUE_FORM_SCREEN = "ESTOQUE_FORM_SCREEN";
     private CardLayout cardLayout;
     private JPanel mainPanel;
+    private EstoqueForm estoqueForm;
+    private EstoqueList estoqueList;
+
 
     public GerenciadorProjetoApp(){
         setTitle("Gerenciador de Projetos");
@@ -34,10 +39,16 @@ public class GerenciadorProjetoApp extends JFrame {
         UserList userList = new UserList();
         mainPanel.add(userList, USER_LIST_SCREEN);
 
-        EstoqueList estoqueList = new EstoqueList();
+        estoqueList = new EstoqueList(this::abrirFormularioEdicao);
         mainPanel.add(estoqueList, ESTOQUE_LIST_SCREEN);
 
-        EstoqueForm estoqueForm = new EstoqueForm();
+        estoqueForm = new EstoqueForm();
+
+        estoqueForm.setAoSalvarCallback(() -> {
+            estoqueList.atualizarTabela();
+            cardLayout.show(mainPanel, ESTOQUE_LIST_SCREEN);
+        });
+
         mainPanel.add(estoqueForm, ESTOQUE_FORM_SCREEN);
 
         JMenu menu = new JMenu("Menu");
@@ -66,6 +77,7 @@ public class GerenciadorProjetoApp extends JFrame {
         });
 
         cadastrarEstoqueItem.addActionListener(e -> {
+            estoqueForm.limparCampos();
             cardLayout.show(mainPanel, ESTOQUE_FORM_SCREEN);
         });
 
@@ -76,6 +88,12 @@ public class GerenciadorProjetoApp extends JFrame {
 
         add(mainPanel);
     }
+
+    public void abrirFormularioEdicao(Estoque estoque) {
+        estoqueForm.preencherCampos(estoque);
+        cardLayout.show(mainPanel, "ESTOQUE_FORM_SCREEN");
+    }
+
 
     public static void main(String[] args) {
         System.setProperty("sun.java2d.uiScale", "2.0");

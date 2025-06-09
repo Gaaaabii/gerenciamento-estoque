@@ -21,6 +21,10 @@ public class EstoqueListTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
+    public List<Estoque> getRoupas() {
+        return roupas;
+    }
+
     @Override
     public int getRowCount() {
         return roupas != null ? roupas.size() : 0;
@@ -42,6 +46,8 @@ public class EstoqueListTableModel extends AbstractTableModel {
             case 4 -> roupa.getQuantidade();
             case 5 -> roupa.getPrecoUnitario();
             case 6 -> roupa.getCategoria();
+            case 7 -> "Editar";
+            case 8 -> "Excluir";
             default -> null;
         };
     }
@@ -52,11 +58,12 @@ public class EstoqueListTableModel extends AbstractTableModel {
     }
 
     @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 7 || columnIndex == 8; // apenas Editar/Excluir são clicáveis
+    }
+
+    @Override
     public Class<?> getColumnClass(int columnIndex) {
-        return switch (columnIndex) {
-            case 0, 4 -> Integer.class;
-            case 5 -> Double.class;
-            default -> String.class;
-        };
+        return String.class;
     }
 }
