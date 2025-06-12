@@ -9,7 +9,7 @@ public class TesteConexaoJPA {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("taskhubPU");
         EntityManager em = emf.createEntityManager();
 
-        System.out.println("✅ Conexão com o banco de dados realizada com sucesso!");
+        System.out.println("Conexão com o banco de dados realizada com sucesso!");
 
         em.close();
         emf.close();

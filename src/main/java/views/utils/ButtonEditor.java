@@ -1,8 +1,8 @@
 package views.utils;
 
-import dao.EstoqueDAO;
-import models.Estoque;
-import views.estoque.EstoqueList;
+import models.Usuario;
+import models.dao.UsuarioDAO;
+import views.user.UserList;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,18 +14,18 @@ public class ButtonEditor extends DefaultCellEditor {
     private String label;
     private boolean isPushed;
     private String acao;
-    private EstoqueList estoqueList;
+    private UserList userList;
 
-    public ButtonEditor(JCheckBox checkBox, String acao, EstoqueList estoqueList) {
+    public ButtonEditor(JCheckBox checkBox, String acao, UserList userList) {
         super(checkBox);
         this.acao = acao;
-        this.estoqueList = estoqueList;
+        this.userList = userList;
 
         button = new JButton();
         button.setOpaque(true);
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                fireEditingStopped();
+                fireEditingStopped(); // Finaliza a edição antes de executar ação
             }
         });
     }
@@ -41,23 +41,21 @@ public class ButtonEditor extends DefaultCellEditor {
 
     @Override
     public Object getCellEditorValue() {
-        System.out.println("Botão clicado: " + acao);
         if (isPushed) {
-            int row = estoqueList.getTable().getSelectedRow();
-            int id = (int) estoqueList.getTable().getModel().getValueAt(row, 0); // Coluna 0 = ID
+            int row = userList.getTable().getSelectedRow();
+            Usuario usuario = userList.getTableModel().getUsuarioAt(row);
 
-            if ("excluir".equalsIgnoreCase(acao)) {
+            if ("editar".equalsIgnoreCase(acao)) {
+                userList.getOnEditar().accept(usuario);
+            } else if ("excluir".equalsIgnoreCase(acao)) {
                 int confirm = JOptionPane.showConfirmDialog(button,
-                        "Deseja remover o item com ID " + id + "?", "Confirmação",
+                        "Deseja excluir o usuário?", "Confirmação",
                         JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
-                    new EstoqueDAO().remover(id);
-                    estoqueList.atualizarTabela();
-                    JOptionPane.showMessageDialog(button, "Item removido.");
+                    new UsuarioDAO().delete(usuario.getId());
+                    userList.atualizarTabela();
+                    JOptionPane.showMessageDialog(button, "Usuário removido com sucesso!");
                 }
-            } else if ("editar".equalsIgnoreCase(acao)) {
-                Estoque item = estoqueList.getTableModel().getRoupas().get(row);
-                estoqueList.getAoEditar().accept(item);
             }
         }
         isPushed = false;
@@ -68,10 +66,5 @@ public class ButtonEditor extends DefaultCellEditor {
     public boolean stopCellEditing() {
         isPushed = false;
         return super.stopCellEditing();
-    }
-
-    @Override
-    protected void fireEditingStopped() {
-        super.fireEditingStopped();
     }
 }

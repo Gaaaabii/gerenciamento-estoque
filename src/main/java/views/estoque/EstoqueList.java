@@ -6,8 +6,10 @@ import dao.EstoqueDAO;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import views.utils.EstoqueButtonEditor;
+import javax.swing.table.TableColumn;
+import views.estoque.ButtonRenderer;
 
-import views.utils.ButtonEditor;
 import java.util.function.Consumer;
 
 public class EstoqueList extends JPanel {
@@ -15,6 +17,8 @@ public class EstoqueList extends JPanel {
     public JTable table;
     private EstoqueDAO estoqueDAO = new EstoqueDAO();
     private Consumer<Estoque> aoEditar;
+    private JTextField campoPesquisa;
+    private JButton botaoPesquisar;
 
     public EstoqueList() {
         this.initComponents();
@@ -71,19 +75,46 @@ public class EstoqueList extends JPanel {
     private void initComponents() {
         setLayout(new BorderLayout());
 
+        // Campo de pesquisa
+        campoPesquisa = new JTextField(20);
+        botaoPesquisar = new JButton("Pesquisar");
+
+        botaoPesquisar.addActionListener(e -> {
+            String nomeDigitado = campoPesquisa.getText().trim();
+            if (nomeDigitado.isEmpty()) {
+                atualizarTabela(); // mostra tudo
+            } else {
+                filtrarPorNome(nomeDigitado); // filtra
+            }
+        });
+
+        JPanel painelPesquisa = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        painelPesquisa.add(new JLabel("Pesquisar por Nome:"));
+        painelPesquisa.add(campoPesquisa);
+        painelPesquisa.add(botaoPesquisar);
+        add(painelPesquisa, BorderLayout.NORTH);
+
         tableModel = new EstoqueListTableModel(List.of());
         table = new JTable(tableModel);
 
-        // Renderização e ação dos botões na tabela
-        table.getColumn("Editar").setCellRenderer(new ButtonRenderer());
-        table.getColumn("Excluir").setCellRenderer(new ButtonRenderer());
+        TableColumn editarCol = table.getColumnModel().getColumn(7);
+        editarCol.setCellRenderer(new ButtonRenderer());
+        editarCol.setCellEditor(new EstoqueButtonEditor(new JCheckBox(), "editar", this));
 
-        table.getColumn("Editar").setCellEditor(new ButtonEditor(new JCheckBox(), "editar", this));
-        table.getColumn("Excluir").setCellEditor(new ButtonEditor(new JCheckBox(), "excluir", this));
+        TableColumn excluirCol = table.getColumnModel().getColumn(8);
+        excluirCol.setCellRenderer(new ButtonRenderer());
+        excluirCol.setCellEditor(new EstoqueButtonEditor(new JCheckBox(), "excluir", this));
 
         JScrollPane scrollPane = new JScrollPane(table);
-
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    private void filtrarPorNome(String nome) {
+        List<Estoque> todos = estoqueDAO.listarTodos();
+        List<Estoque> filtrados = todos.stream()
+                .filter(e -> e.getNome().toLowerCase().contains(nome.toLowerCase()))
+                .toList();
+
+        tableModel.setRoupas(filtrados);
+    }
 }
