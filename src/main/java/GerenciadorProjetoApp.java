@@ -43,14 +43,13 @@ public class GerenciadorProjetoApp extends JFrame {
             cardLayout.show(mainPanel, USER_FORM_SCREEN);
         });
 
-        mainPanel.add(userList, USER_LIST_SCREEN);
-
         userForm = new UserForm();
         userForm.setAoSalvarCallback(() -> {
-            userList = new UserList(this::abrirFormularioUsuario);
-            mainPanel.add(userList, USER_LIST_SCREEN);
-
+            userList.atualizarTabela(); // Recarrega os dados na tabela
+            cardLayout.show(mainPanel, USER_LIST_SCREEN); // Redireciona para a listagem
         });
+
+        mainPanel.add(userList, USER_LIST_SCREEN);
         mainPanel.add(userForm, USER_FORM_SCREEN);
 
         estoqueList = new EstoqueList(this::abrirFormularioEdicao);
@@ -122,6 +121,6 @@ public class GerenciadorProjetoApp extends JFrame {
     public void abrirFormularioUsuario(Usuario usuario) {
         userForm.preencherCampos(usuario);
         cardLayout.show(mainPanel, USER_FORM_SCREEN);
-    }
 
+    }
 }
